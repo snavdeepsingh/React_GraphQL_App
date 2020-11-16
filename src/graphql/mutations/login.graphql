@@ -4,10 +4,8 @@ mutation Login ($username: String!, $password: String!){
       field
     message
   }
-		user{
-      id
-      username
-      createdAt
+	user{
+      ...RegularUser
     }
   }
 }
