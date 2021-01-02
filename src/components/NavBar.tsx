@@ -5,6 +5,7 @@ import { useLogoutMutation, useMeQuery } from '../generated/graphql';
 import { isServer } from '../utils/isServer';
 import { Heading } from '@chakra-ui/core';
 import { useRouter } from 'next/router';
+import { useApolloClient } from '@apollo/client';
 
 interface NavBarProps {
 
@@ -12,15 +13,16 @@ interface NavBarProps {
 
 export const NavBar: React.FC<NavBarProps> = ({ }) => {
   const router = useRouter();
-  const [{fetching: logoutFetching} , logout] = useLogoutMutation();
-  const [{ data, fetching }] = useMeQuery({
-    pause: isServer(),
+  const [logout, { loading: logoutFetching }] = useLogoutMutation();
+  const appolloClient = useApolloClient();
+  const { data, loading } = useMeQuery({
+    skip: isServer(),
   });
   
   let body = null;
 
   // data is loading
-  if (fetching) {
+  if (loading) {
     body = null;
     // user not logged in
   } else if (!data?.me) {
@@ -46,9 +48,9 @@ export const NavBar: React.FC<NavBarProps> = ({ }) => {
         <Box mr={2}>{data.me.username}</Box>
         <Button
           variant="link"
-          onClick={() => {
-            logout();
-            router.reload();
+          onClick={async () => {
+            await logout();
+            await appolloClient.resetStore();
           }}
           isLoading={logoutFetching}
         >logout</Button>
