@@ -6,6 +6,7 @@ import { Layout } from '../../../components/Layout';
 import { useUpdatePostMutation, usePostQuery } from '../../../generated/graphql';
 import { useGetIntId } from '../../../utils/useGetIntId';
 import { useRouter } from 'next/router';
+import { withApollo } from '../../../utils/withApollo';
 
 export const EditPost = ({ }) => {
   const router = useRouter();
@@ -71,4 +72,4 @@ export const EditPost = ({ }) => {
   );
 }
 
-export default EditPost;
+export default withApollo({ ssr: false }) (EditPost);

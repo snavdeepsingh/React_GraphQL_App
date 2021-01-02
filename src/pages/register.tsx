@@ -3,9 +3,10 @@ import { Formik, Form } from 'formik';
 import { Wrapper } from '../components/Wrapper';
 import { InputField } from '../components/InputField';
 import { Box, Button } from '@chakra-ui/core';
-import { useRegisterMutation } from '../generated/graphql';
+import { MeQuery, useRegisterMutation, MeDocument } from '../generated/graphql';
 import { toErrorMap } from '../utils/toErrorMap';
 import { useRouter } from 'next/router';
+import { withApollo } from '../utils/withApollo';
 interface registerProps {
 
 }
@@ -19,7 +20,18 @@ const Register: React.FC<registerProps> = ({ }): JSX.Element => {
         initialValues={{ email: '', username: '', password: '' }}
         onSubmit={async (values, {setErrors}) => {
           console.log(values)
-          const response = await register({ variables: {options: values}})
+          const response = await register({
+            variables: { options: values },
+            update: (cache, { data }) => {
+              cache.writeQuery<MeQuery>({
+                query: MeDocument,
+                data: {
+                  __typename: 'Query',
+                  me: data?.register.user,
+                }
+              })
+            }
+          })
           if (response.data?.register.errors) {
             setErrors(toErrorMap(response.data.register.errors))
           } else if (response.data?.register.user) {
@@ -63,4 +75,4 @@ const Register: React.FC<registerProps> = ({ }): JSX.Element => {
     );
 }
 
-export default Register;
+export default withApollo({ ssr: false }) (Register);

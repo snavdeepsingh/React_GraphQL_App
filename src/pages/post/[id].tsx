@@ -4,6 +4,7 @@ import { Heading } from '@chakra-ui/core';
 import { Box } from '@chakra-ui/core';
 import { useGetPostFromUrl } from '../../utils/useGetPostFromUrl';
 import { EditDeletePostButtons } from '../../components/EditDeletePostButtons';
+import { withApollo } from '../../utils/withApollo';
 
 export const Post = ({ }) => {
   const { data, error, loading } = useGetPostFromUrl();
@@ -46,4 +47,4 @@ export const Post = ({ }) => {
   );
 }
 
-export default Post;
+export default withApollo({ ssr: true }) (Post);
